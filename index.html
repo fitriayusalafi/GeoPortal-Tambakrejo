@@ -1,0 +1,2207 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GeoPortal Tambakrejo</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts-3d.js"></script>
+<style>
+  
+  * { margin:0; padding:0; box-sizing:border-box; font-family:Poppins,sans-serif; }
+  html, body {
+  min-height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+  body{
+  background: linear-gradient(135deg,#015d69,#14a371,#8eb406);
+  background-size: 400% 400%;
+  animation: gradientFlow 20s ease infinite;
+}
+  @keyframes gradientFlow{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+  }
+  
+/* LOGO NAV */
+.nav-logos {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.logo-left {
+  height: 45px;
+  width: auto;
+  object-fit: contain;
+}
+
+.logo-right {
+  height: 90px !important;  /* lebih tinggi sedikit */
+  width: auto;
+  object-fit: contain;
+}
+
+.logo-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.logo {
+  height: 70px;
+  object-fit: contain;
+  margin-top: 40px;
+}
+
+/* BACKGROUND HOME */
+#home {
+position: relative;
+width: 100%;
+height: 100vh;
+overflow: hidden;
+}
+
+#home::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1900px;
+  height: 1050px;
+  background-image: url("https://raw.githubusercontent.com/fitriayusalafi/TAMBAKREJO/65348a7cfaf0ba59902b5198f0cb25512b2752df/siluet-tambakrejo.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  transform: translate(-50%, -50%);
+  opacity: 0.15;
+  z-index: 1;
+}
+
+/* CENTER LAYOUT */
+.home-container {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 25px;
+}
+
+/* LOGO RAPIH & ELEGAN */
+.logo-row {
+  display: flex;
+  gap: 25px;
+  align-items: center;
+}
+
+.logo {
+  height: 70px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+}
+
+/* CARD GLASS EFFECT */
+.home-card {
+  padding: 35px 45px;
+  max-width: 620px;
+  text-align: center;
+  border-radius: 18px;
+  backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.35);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.2);
+}
+
+.home-card h1 {
+  font-size: 36px;
+  color: white;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.home-card p {
+  font-size: 17px;
+  color: #f1f1f1;
+  margin-bottom: 22px;
+}
+
+/* BUTTON MODERN */
+.btn-home {
+  padding: 12px 28px;
+  font-size: 17px;
+  font-weight: 600;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg,#ffa726,#fb8c00);
+  color: white;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.btn-home:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+/* STORYTELLING BOX */
+.info-box {
+  max-width: 780px;
+  width: 85%;
+  padding: 35px 40px;
+  border-radius: 20px;
+  backdrop-filter: blur(14px);
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.25);
+  text-align: center;
+  animation: fadeInBox 0.5s ease;
+}
+
+.info-box h2 {
+  font-size: 28px;
+  margin-bottom: 15px;
+  color: #ffeeb8;
+}
+
+.info-box p {
+  font-size: 16px;
+  color: #ffffff;
+  margin-bottom: 25px;
+  line-height: 1.6;
+}
+
+/* Button styling biar match */
+.info-box .btn {
+  padding: 10px 22px;
+  margin: 5px;
+  border-radius: 40px;
+  background: linear-gradient(135deg,#ffa726,#fb8c00);
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.25s;
+}
+
+.info-box .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 17px rgba(0,0,0,0.25);
+}
+
+/* Fade animation */
+@keyframes fadeInBox {
+  from {opacity:0; transform:translateY(20px);}
+  to {opacity:1; transform:translateY(0);}
+}
+
+  nav{
+    position:fixed; top:0; left:0; width:100%; height:60px;
+    background:linear-gradient(45deg,#017686,#0c9e6b);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 30px; color:rgb(255, 255, 255); z-index:2000;
+    box-shadow:0 4px 20px rgba(0,0,0,0.3);
+  }
+  nav ul{list-style:none; display:flex; gap:25px;}
+  nav ul li{cursor:pointer; transition:0.3s;}
+  nav ul li:hover{color:#ffe186;}
+
+  section{
+    display:none; height:100vh; width:100vw;
+    justify-content:center; align-items:center;
+    flex-direction:column; color:white; text-align:center; padding:2rem;
+  }
+  section.active{display:flex;}
+
+  #map{ height:100vh; width:100vw; }
+
+  /* FAQ Styling */
+  #page-faq {
+    width: 70%;
+    max-width: 850px;
+    backdrop-filter: blur(15px);
+    background: rgba(255,255,255,0.12);
+    padding: 20px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.25);
+  }
+  details {
+    background: rgba(255,255,255,0.15);
+    padding: 15px;
+    border-radius: 15px;
+    border:1px solid rgba(255,255,255,0.25);
+    cursor:pointer;
+    transition: 0.3s;
+  }
+  details:hover{
+    background: rgba(255,255,255,0.25);
+  }
+  summary{
+    font-weight:600;
+    color:#ffe186;
+  }
+  details p { margin-top:10px; color:white; }
+
+/* ABOUT PAGE – ELEGANT TWO COLUMN */
+#page-about {
+  width: 85%;
+  max-width: 1200px;
+  margin: auto;
+  margin-top: 120px;
+}
+
+.about-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+/* BOX KHUSUS TEXT */
+.about-box {
+  flex: 1.2;
+  backdrop-filter: blur(14px);
+  background: rgba(255,255,255,0.15);
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.28);
+  padding: 32px 35px;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+}
+
+.about-box h2 {
+  font-size: 35px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: #ffeeb8;
+}
+
+.about-box p {
+  text-align: justify;
+  line-height: 1.7;
+  color: #ffffff;
+  font-size: 16px;
+}
+
+/* GAMBAR DI SEBELAH KANAN TANPA BOX */
+.about-image {
+  flex: 1;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 22px;
+  box-shadow: none !important;
+  object-fit: cover;
+  border: none !important;
+}
+/* Fade + slide masuk */
+.about-container {
+  opacity: 0;
+  transform: translateY(25px);
+  animation: aboutFade 1s ease forwards;
+}
+
+@keyframes aboutFade {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Glow halus kayak "breathing" */
+.about-box {
+  animation: glowSoft 4s ease-in-out infinite;
+}
+
+@keyframes glowSoft {
+  0% {
+    box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+  }
+  50% {
+    box-shadow: 0 12px 34px rgba(255,255,255,0.10),
+                0 10px 28px rgba(0,0,0,0.20);
+  }
+  100% {
+    box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+  }
+}
+
+/* Parallax hover elegan untuk gambar */
+.about-image {
+  transition: transform 0.6s ease, box-shadow 0.6s ease;
+}
+
+.about-image:hover {
+  transform: scale(1.03) translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+}
+
+/* SECTION */
+.section-5w1h {
+  width: 90%;
+  max-width: 1100px;
+  margin: 70px auto 60px auto;
+}
+
+/* Title */
+.title-5w1h.tps {
+  text-align: center;
+  font-size: 30px;
+  font-weight: 800;
+  color: #ffeeb8;
+  padding-top: 100px;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+  animation: fadeDown 0.8s ease both;
+}
+
+/* GRID */
+.w1h-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  padding: 10px 0;
+}
+
+/* BOX */
+.w1h-box {
+  padding: 24px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.23);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.25);
+  transition: transform .6s cubic-bezier(.22,.61,.36,1), 
+              box-shadow .6s cubic-bezier(.22,.61,.36,1), 
+              border-color .6s ease;
+  animation: fadeUp 1s ease both;
+}
+
+.w1h-box:hover {
+  transform: translateY(-10px) scale(1.03);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+/* Title inside box */
+.w1h-box h3 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #ffeeb8;
+}
+
+/* Paragraph */
+.w1h-box p {
+  color: #ffffff;
+  text-align: justify;
+  line-height: 1.6;
+}
+
+/* BUTTON */
+.btn-group {
+  margin-top: 40px;
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-25px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* SECTION WRAPPER */
+.section-5w1h {
+  width: 90%;
+  max-width: 1250px;
+  margin: 70px auto 80px auto;
+  padding-bottom: 40px;
+}
+
+/* TITLE */
+.title-5w1h.drainase {
+  text-align: center;
+  font-size: 30px;
+  font-weight: 800;
+  color: #fff5cc;
+  padding-top: 150px;
+  margin-bottom: 50px;
+  letter-spacing: 1px;
+  text-shadow: 0 3px 15px rgba(0,0,0,0.3);
+  animation: fadeDown 0.8s ease both;
+}
+
+/* GRID */
+.w1h-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px 30px;
+}
+
+/* CARD STYLE */
+.w1h-box {
+  background: rgba(255, 255, 255, 0.14);
+  padding: 28px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+  animation: fadeUp 1s ease both;
+  transition: transform .45s ease, box-shadow .45s ease;
+}
+
+.w1h-box:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 22px 45px rgba(0,0,0,0.35);
+}
+
+/* CARD TITLE */
+.w1h-box h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff3aa;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+/* CARD TEXT */
+.w1h-box p {
+  color: white;
+  line-height: 1.6;
+  text-align: justify;
+  font-size: 15px;
+}
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeDown {
+  0% { opacity: 0; transform: translateY(-30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+
+/* Tombol Utama */
+.btn {
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(135deg, #ffd37a, #ff9f45);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+  transition: 0.25s ease;
+}
+/* Container tombol program (1 baris, center) */
+.program-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+/* Tombol program warna orange */
+.program-btn {
+  background: linear-gradient(135deg, #ffd37a, #ff9f45);
+  color: #fff;
+}
+
+/* Tombol kembali warna hijau */
+.back-btn {
+  background: linear-gradient(135deg, #7ddf8f, #3cb371);
+  color: #fff;
+  margin-top: 25px;
+  padding: 12px 28px;
+  font-weight: 700;
+}
+
+.back-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.25);
+}
+/* BOX daftar program */
+.info-box-program {
+  width: 85%;
+  max-width: 1100px;
+  margin: 120px auto 60px auto;
+  padding: 40px 50px;
+  border-radius: 25px;
+
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+
+  text-align: center;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+  animation: fadeIn 0.6s ease;
+}
+
+/* Hover anim */
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.28);
+}
+
+/* Tombol di bagian 5W1H — biar sejajar */
+.info-box .btn {
+  margin-top: 15px;
+  margin-right: 10px;
+}
+/* === FIX SERAGAM TOMBOL STORYTELLING === */
+
+/* Tombol Lihat di Peta */
+.story-btn-primary {
+  padding: 12px 26px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ffd37a, #ff9f45);
+  color: #fff;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+  cursor: pointer;
+  transition: 0.25s ease;
+  margin-bottom: 50px;
+}
+
+.story-btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.28);
+}
+
+/* Tombol Kembali */
+.story-btn-secondary {
+  padding: 12px 26px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ffd37a, #ff9f45);
+  color: #fff;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+  cursor: pointer;
+  transition: 0.25s ease;
+  margin-bottom: 50px;
+}
+
+.story-btn-secondary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.28);
+}
+.section-5w1h.dbd {
+  width: 90%;
+  max-width: 1250px;
+  margin: 140px auto 80px auto; 
+  padding-top: 20px;
+}
+
+.title-5w1h.dbd {
+  text-align: center;
+  font-size: 30px;
+  font-weight: 800;
+  color: #fff5cc;
+  padding-top: 350px;
+  margin-bottom: 30px;
+  letter-spacing: 1px;
+  text-shadow: 0 3px 15px rgba(0,0,0,0.3);
+  animation: fadeDown 0.8s ease both;
+}
+
+/* GRID */
+.w1h-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px 30px;
+}
+
+/* CARD STYLE */
+.w1h-box {
+  background: rgba(255, 255, 255, 0.14);
+  padding: 28px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+  animation: fadeUp 1s ease both;
+  transition: transform .45s ease, box-shadow .45s ease;
+}
+
+.w1h-box:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 22px 45px rgba(0,0,0,0.35);
+}
+
+/* CARD TITLE */
+.w1h-box h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff3aa;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+/* CARD TEXT */
+.w1h-box p {
+  color: white;
+  line-height: 1.6;
+  text-align: justify;
+  font-size: 15px;
+}
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeDown {
+  0% { opacity: 0; transform: translateY(-30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.section-5w1h.umkm {
+  width: 90%;
+  max-width: 1250px;
+  margin: 300px auto 80px auto;
+  padding-bottom: 50px;
+}
+
+/* TITLE */
+.title-5w1h.umkm {
+  text-align: center;
+  font-size: 30px;
+  font-weight: 800;
+  color: #fff5cc;
+  margin-top: 200px;
+  margin-bottom: 30px;
+  letter-spacing: 1px;
+  text-shadow: 0 3px 15px rgba(0,0,0,0.3);
+  animation: fadeDown 0.8s ease both;
+}
+
+/* GRID */
+.w1h-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px 30px;
+}
+
+/* CARD STYLE */
+.w1h-box {
+  background: rgba(255, 255, 255, 0.14);
+  padding: 28px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+  animation: fadeUp 1s ease both;
+  transition: transform .45s ease, box-shadow .45s ease;
+}
+
+.w1h-box:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 22px 45px rgba(0,0,0,0.35);
+}
+
+/* CARD TITLE */
+.w1h-box h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff3aa;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+/* CARD TEXT */
+.w1h-box p {
+  color: white;
+  line-height: 1.6;
+  text-align: justify;
+  font-size: 15px;
+}
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeDown {
+  0% { opacity: 0; transform: translateY(-30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.section-5w1h.banjir {
+  width: 90%;
+  max-width: 1250px;
+  margin: 300px auto 80px auto;
+  padding-bottom: 50px;
+}
+
+/* TITLE */
+.title-5w1h.banjir {
+  text-align: center;
+  font-size: 30px;
+  font-weight: 800;
+  color: #fff5cc;
+  padding-top: 300px;
+  margin-bottom: 30px;
+  letter-spacing: 1px;
+  text-shadow: 0 3px 15px rgba(0,0,0,0.3);
+  animation: fadeDown 0.8s ease both;
+}
+
+/* GRID */
+.w1h-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px 30px;
+}
+
+/* CARD STYLE */
+.w1h-box {
+  background: rgba(255, 255, 255, 0.14);
+  padding: 28px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+  animation: fadeUp 1s ease both;
+  transition: transform .45s ease, box-shadow .45s ease;
+}
+
+.w1h-box:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 22px 45px rgba(0,0,0,0.35);
+}
+
+/* CARD TITLE */
+.w1h-box h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff3aa;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+/* CARD TEXT */
+.w1h-box p {
+  color: white;
+  line-height: 1.6;
+  text-align: justify;
+  font-size: 15px;
+}
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeDown {
+  0% { opacity: 0; transform: translateY(-30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* SECTION MAP */
+.map-section {
+  width: 100%;
+  height: 100vh;
+  padding: 0;
+  margin: 0;
+}
+
+/* WRAPPER */
+.map-wrapper {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+/* PANEL KIRI (1/8 layar) */
+.map-panel {
+  width: 12.5%;
+  min-width: 220px;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(14px);
+  color: #fff;
+  padding: 20px;
+  overflow-y: auto;
+  box-shadow: 4px 0 18px rgba(0,0,0,0.35);
+}
+
+/* ISI PANEL */
+.map-panel h3 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #ffeeb8;
+}
+
+.map-panel ul {
+  list-style: none;
+  padding: 0;
+}
+
+.map-panel li {
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+/* PETA (7/8 layar) */
+#mapView {
+  flex: 1;
+  height: 100%;
+}
+
+/* Reset dasar agar full screen */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: sans-serif;
+}
+
+/* Container Utama */
+.map-section {
+  width: 100%;
+  height: 100vh; /* Mengisi tinggi layar penuh */
+  overflow: hidden;
+  padding: 40px 0 0 0;
+}
+
+.map-wrapper {
+  display: flex; /* Kunci layout berdampingan */
+  height: 100%;
+  width: 100%;
+}
+
+/* PANEL KIRI (1/8) */
+.map-panel {
+  /* Flex-grow 1 untuk porsi 1 dari total 4 */
+  flex: 1; 
+  background-color: #ffffff;
+  color: #333;
+  text-align: left;
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1); /* Bayangan pemisah */
+  z-index: 1000; /* Agar panel berada di atas layer peta jika perlu */
+  overflow-y: auto; /* Scroll jika konten panjang */
+  
+  /* Peringatan Sparring: 12.5% mungkin terlalu kecil */
+  min-width: 250px; /* SAYA PAKSAKAN MIN-WIDTH AGAR KONTEN TIDAK HANCUR */
+}
+
+/* Styling konten panel agar mirip referensi */
+.map-panel h3 {
+  color: #0d9488; /* Warna teal mirip referensi */
+  margin-top: 0;
+  text-transform: uppercase;
+  font-size: 1.2rem;
+  border-bottom: 2px solid #0d9488;
+  padding-bottom: 10px;
+}
+
+.map-panel ul {
+  list-style: none;
+  padding: 0;
+}
+
+.map-panel li {
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9rem;
+}
+
+/* PETA (7/8) */
+#mapView {
+  /* Flex-grow 3 untuk porsi 3 dari total 4 (jika panel flex:1) */
+  /* Namun karena saya pakai min-width di panel, lebih aman pakai flex: 1 auto */
+  flex: 3; 
+  height: 100%;
+  background-color: #e5e5e5; /* Placeholder warna sebelum peta load */
+}
+
+/* RESPONSIVE: Pada layar kecil, ubah jadi atas-bawah */
+@media (max-width: 768px) {
+  .map-wrapper {
+    flex-direction: column-reverse; /* Panel di bawah, Peta di atas */
+  }
+  
+  .map-panel {
+    flex: none;
+    height: 40%; /* Panel ambil 40% tinggi layar */
+    width: 100%;
+    min-width: 0;
+  }
+  
+  #mapView {
+    height: 60%; /* Peta ambil 60% tinggi layar */
+  }
+}
+#layerBtn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 99999;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 10px 18px;
+    border-radius: 999px;
+
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+
+    color: white;
+    background: linear-gradient(135deg, #017686, #0c9e6b);
+    border: none;
+    cursor: pointer;
+
+    box-shadow: 0 6px 16px rgba(1, 118, 134, 0.35);
+}
+#layerMenu {
+    position: fixed;
+    bottom: 80px;
+    right: 24px;
+    z-index: 99999;
+
+    background: white;
+    padding: 14px 16px;
+    border-radius: 12px;
+
+    display: none;
+    box-shadow: 0 10px 25px rgba(0,0,0,.15);
+    font-family: 'Poppins', sans-serif;
+}
+</style>
+</head>
+<body>
+<nav>
+  <h1>GeoPortal Kelurahan Tambakrejo</h1>
+  <ul>
+    <li onclick="showSection('home')">Home</li>
+    <li onclick="showSection('info')">Storytelling</li>
+    <li onclick="showSection('map')">Map</li>
+    <li onclick="showSection('faq')">FAQ</li>
+    <li onclick="showSection('about')">About</li>
+  </ul>
+</nav>
+
+<section id="home" class="active">
+
+  <div class="home-container">
+
+      <div class="logo-row">
+        <img src="https://raw.githubusercontent.com/fitriayusalafi/TAMBAKREJO/f50d1391624ec4dbe14fc6f8e23b02aecd1ed88d/tambakrejo.png" class="logo logo-left">
+        <img src="https://raw.githubusercontent.com/fitriayusalafi/TAMBAKREJO/f50d1391624ec4dbe14fc6f8e23b02aecd1ed88d/UNDIPOfficial.png" class="logo logo-right">
+      </div>
+
+      <div class="home-card">
+        <h1>GeoPortal Kelurahan Tambakrejo</h1>
+        <p>Sistem Informasi Geospasial Kelurahan Tambakrejo yang menyediakan data spasial, peta tematik, dan informasi geostatistik untuk mendukung proses perencanaan, analisis keruangan, serta pengambilan keputusan berbasis lokasi.</p>
+
+        <button class="btn-home" onclick="showSection('info')">Mulai Eksplorasi</button>
+      </div>
+
+  </div>
+
+</section>
+
+<!-- INFO -->
+<section id="info">
+  <div class="info-box-program">
+    <h2>Daftar Program</h2>
+    <p>Pilih salah satu untuk membuka story lengkap:</p>
+
+    <div class="program-buttons">
+      <button class="btn program-btn" onclick="showSection('story_tps3r')">TPS 3R</button>
+      <button class="btn program-btn" onclick="showSection('drainase')">Drainase</button>
+      <button class="btn program-btn" onclick="showSection('dbd')">DBD</button>
+      <button class="btn program-btn" onclick="showSection('umkm')">UMKM</button>
+      <button class="btn program-btn" onclick="showSection('banjir')">Luapan Banjir</button>
+    </div>
+
+    <button class="btn back-btn" onclick="showSection('home')">Kembali</button>
+  </div>
+</section>
+
+<!-- TPS 3R -->
+<section id="story_tps3r" class="section-5w1h">
+  <h2 class="title-5w1h tps">Pemetaan Rekomendasi Daerah Peruntukan TPS 3R di Kelurahan Tambakrejo</h2>
+
+  <div class="w1h-grid elegant-animate">
+
+    <div class="w1h-box">
+      <h3>What</h3>
+      <p>Pemetaan rekomendasi daerah peruntukan TPS 3R yang sesuai secara spasial dan mendukung pengelolaan sampah berkelanjutan dalam wilayah Kelurahan Tambakrejo.</p>
+    </div>
+
+    <div class="w1h-box">
+      <h3>Why</h3>
+      <p>Pemilihan SDGs 12 dilakukan karena TPS yang ada hanya berfungsi sebagai transit, sehingga diperlukan TPS 3R untuk meningkatkan kapasitas pengelolaan sampah.</p>
+    </div>
+
+    <div class="w1h-box">
+      <h3>Where</h3>
+      <p>Penerapan dilakukan di Kelurahan Tambakrejo berdasarkan regulasi pembangunan TPS 3R baru.</p>
+    </div>
+
+    <div class="w1h-box">
+      <h3>Who</h3>
+      <p>Pemerintah sebagai pemangku kebijakan serta masyarakat lokal sebagai pengelola dan penerima manfaat.</p>
+    </div>
+
+    <div class="w1h-box">
+      <h3>When</h3>
+      <p>Data diperoleh melalui survei lapangan dan digitasi spasial menggunakan foto udara.</p>
+    </div>
+
+    <div class="w1h-box">
+      <h3>How</h3>
+      <p>Analisis spasial SIG mempertimbangkan kepadatan penduduk, jaringan jalan, lahan, dan potensi lingkungan.</p>
+    </div>
+
+  </div>
+
+  <div class="btn-group">
+    <button class="story-btn-primary" onclick="goToMapAndFocus('tps3r')">Lihat di Peta</button>
+    <button class="story-btn-secondary" onclick="showSection('info')">Kembali</button>
+  </div>
+</section>
+<!-- DRAINASE -->
+<section id="drainase" class="section-5w1h drainase">
+  <h2 class="title-5w1h drainase">Pemetaan Rencana Jaringan Drainase</h2>
+
+  <div class="w1h-grid">
+
+    <!-- WHAT -->
+    <div class="w1h-box">
+      <h3>What</h3>
+      <p>Tujuan utama kegiatan ini adalah mendukung SDGs 11 melalui penyediaan peta rencana jaringan drainase di Kelurahan Tambakrejo guna mengurangi risiko banjir dan meningkatkan kualitas permukiman.</p>
+    </div>
+
+    <!-- WHY -->
+    <div class="w1h-box">
+      <h3>Why</h3>
+      <p>Drainase berperan penting menciptakan lingkungan aman dan berkelanjutan. Pemetaan ini mendukung target SDGs 11 terkait peningkatan infrastruktur, mitigasi bencana, dan permukiman layak huni.</p>
+    </div>
+
+    <!-- WHERE -->
+    <div class="w1h-box">
+      <h3>Where</h3>
+      <p>Kegiatan dilakukan di seluruh wilayah Kelurahan Tambakrejo, mencakup saluran drainase primer dan area prioritas perbaikan maupun pembangunan saluran baru.</p>
+    </div>
+
+    <!-- WHO -->
+    <div class="w1h-box">
+      <h3>Who</h3>
+      <p>Masyarakat Tambakrejo sebagai penerima manfaat langsung, serta pemerintah daerah sebagai pengguna data spasial untuk perencanaan infrastruktur drainase.</p>
+    </div>
+
+    <!-- WHEN -->
+    <div class="w1h-box">
+      <h3>When</h3>
+      <p>Data diperoleh melalui survei lapangan, foto udara, data sekunder, dan verifikasi spasial. Peta dapat digunakan kapan saja untuk evaluasi dan perencanaan drainase.</p>
+    </div>
+
+    <!-- HOW -->
+    <div class="w1h-box">
+      <h3>How</h3>
+      <p>Pemetaan drainase dilakukan dengan GIS melalui digitalisasi saluran, analisis kemiringan, aliran air, karakteristik tanah, curah hujan, serta penyusunan peta rencana jaringan drainase.</p>
+    </div>
+
+  </div>
+
+  <div class="btn-group">
+    <button class="story-btn-primary" onclick="goToMapAndFocus('drainase')">Lihat di Peta</button>
+    <button class="story-btn-secondary" onclick="showSection('info')">Kembali</button>
+  </div>
+
+</section>
+
+<!-- DBD -->
+<section id="dbd" class="section-5w1h dbd">
+  <h2 class="title-5w1h dbd">Pemetaan Indeks Kerentanan DBD</h2>
+
+  <div class="w1h-grid elegant-animate">
+
+    <!-- WHAT -->
+    <div class="w1h-box">
+      <h3>What (Apa)</h3>
+      <p>
+        Program ini bertujuan mendukung kesehatan melalui penyusunan peta indeks
+        kerentanan penyakit DBD. Pemetaan ini menjadi dasar evaluasi untuk meningkatkan kualitas
+        lingkungan dan kondisi sosial, sehingga penyebaran DBD dapat ditekan secara efektif.
+      </p>
+    </div>
+
+    <!-- WHY -->
+    <div class="w1h-box">
+      <h3>Why (Mengapa)</h3>
+      <p>
+        Dengan mengetahui tingkat kerentanan DBD di wilayah tertentu, langkah penanganan lingkungan dan sosial dapat diarahkan lebih tepat untuk menciptakan kualitas hidup yang sehat dan aman dari risiko penyakit.
+      </p>
+    </div>
+
+    <!-- WHERE -->
+    <div class="w1h-box">
+      <h3>Where (Di Mana)</h3>
+      <p>
+        Pemetaan indeks kerentanan DBD difokuskan di Kelurahan Tambakrejo, Kecamatan Gayamsari,
+        Kota Semarang, dengan unit spasial terkecil berupa RW sebagai dasar analisis wilayah.
+      </p>
+    </div>
+
+    <!-- WHO -->
+    <div class="w1h-box">
+      <h3>Who (Siapa)</h3>
+      <p>
+        Manfaat program ini ditujukan bagi masyarakat dan pemerintah. Peta kerentanan membantu
+        menguatkan sinergi dalam menanggulangi potensi penyebaran DBD, sehingga tercipta lingkungan
+        yang lebih aman dan sehat.
+      </p>
+    </div>
+
+    <!-- WHEN -->
+    <div class="w1h-box">
+      <h3>When (Kapan)</h3>
+      <p>
+        Data dikumpulkan dari survei lapangan, pengisian kuesioner, pemetaan spasial, dan variabel
+        lainnya. Data ini digunakan untuk menghasilkan nilai indeks kerentanan DBD dan mendukung
+        pengambilan keputusan kapan saja diperlukan.
+      </p>
+    </div>
+
+    <!-- HOW -->
+    <div class="w1h-box">
+      <h3>How (Bagaimana)</h3>
+      <p>
+        Program ini dilakukan melalui pengumpulan data lapangan, digitasi variabel yang memengaruhi penyebaran DBD, pengolahan data, serta pembuatan peta kerentanan fisik, aksesibilitas, kerentanan sosial, dan indeks kerentanan DBD. Peta interaktif yang dihasilkan diharapkan dapat membantu pemerintah dan masyarakat bekerja sama dalam menangani faktor-faktor pemicu penyebaran penyakit tersebut.
+      </p>
+    </div>
+
+  </div>
+
+  <div class="btn-group">
+    <button class="story-btn-primary" onclick="goToMapAndFocus('dbd')">Lihat di Peta</button>
+    <button class="story-btn-secondary" onclick="showSection('info')">Kembali</button>
+  </div>
+
+</section>
+
+<!-- UMKM -->
+<section id="umkm" class="section-5w1h umkm">
+  <h2 class="title-5w1h umkm">Pemetaan Persebaran UMKM</h2>
+
+  <div class="w1h-grid">
+
+    <!-- WHAT -->
+    <div class="w1h-box">
+      <h3>What</h3>
+      <p>Tujuan utamanya adalah mendukung pencapaian SDGs 8 , yaitu mendorong pertumbuhan ekonomi lokal yang berkelanjutan dan menciptakan pekerjaan yang layak, khususnya melalui digitalisasi data UMKM di Kelurahan Tambakrejo.</p>
+    </div>
+
+    <!-- WHY -->
+    <div class="w1h-box">
+      <h3>Why</h3>
+      <p>Karena UMKM adalah tulang punggung ekonomi lokal. Dengan memetakan dan mempromosikan UMKM secara digital, platform ini membantu meningkatkan promosi usaha dan memastikan potensi ekonomi lokal dapat terpetakan dan dimanfaatkan secara berkelanjutan.</p>
+    </div>
+
+    <!-- WHERE -->
+    <div class="w1h-box">
+      <h3>Where</h3>
+      <p>Fokus geografisnya adalah di wilayah Kelurahan Tambakrejo, Kota Semarang. Saat ini, cakupan data difokuskan di wilayah ini, terutama pada sektor UMKM yang ada.</p>
+    </div>
+
+    <!-- WHO -->
+    <div class="w1h-box">
+      <h3>Who</h3>
+      <p>Pelaku UMKM mendapatkan promosi yang lebih luas. Masyarakat umum dapat dengan mudah mencari informasi dan lokasi UMKM. Pemerintah mendapatkan data spasial untuk pengambilan Keputusan</p>
+    </div>
+
+    <!-- WHEN -->
+    <div class="w1h-box">
+      <h3>When</h3>
+      <p>Data yang disajikan berasal dari survei lapangan, wawancara, dan data resmi yang diverifikasi spasial. Data ini digunakan setiap saat oleh pengguna untuk navigasi, promosi, dan analisis berbasis data spasial.</p>
+    </div>
+
+    <!-- HOW -->
+    <div class="w1h-box">
+      <h3>How</h3>
+      <p>Melalui digitalisasi persebaran UMKM dan penyediaan fitur seperti Peta Interaktif dan Informasi Detail. Ini membantu memetakan potensi ekonomi, sehingga pelaku usaha, pemerintah, dan masyarakat dapat mengambil keputusan yang lebih baik.</p>
+    </div>
+
+  </div>
+
+  <div class="btn-group">
+    <button class="story-btn-primary" onclick="goToMapAndFocus('umkm')">Lihat di Peta</button>
+    <button class="story-btn-secondary" onclick="showSection('info')">Kembali</button>
+  </div>
+
+</section>
+
+<!-- BANJIR -->
+<section id="banjir" class="section-5w1h banjir">
+  <h2 class="title-5w1h banjir">Pemetaan Luapan Area Banjir</h2>
+
+  <div class="w1h-grid">
+
+    <!-- WHAT -->
+    <div class="w1h-box">
+      <h3>What</h3>
+      <p>Kegiatan ini berupa analisis area luapan banjir akibat kenaikan debit air di Kelurahan Tambakrejo menggunakan Sistem Informasi Geospasial, melalui pemetaan curah hujan, kelerengan, penggunaan lahan, jarak sungai, dan jenis tanah, serta penyajian hasilnya dalam bentuk WebGIS interaktif.</p>
+    </div>
+
+    <!-- WHY -->
+    <div class="w1h-box">
+      <h3>Why</h3>
+      <p>Kegiatan dilakukan karena Tambakrejo merupakan kawasan pesisir ber-elevasi rendah, mengalami penurunan muka tanah, rawan luapan dari Banjir Kanal Timur, serta memiliki keterbatasan drainase sehingga dibutuhkan pemetaan kerentanan untuk mendukung mitigasi.</p>
+    </div>
+
+    <!-- WHERE -->
+    <div class="w1h-box">
+      <h3>Where</h3>
+      <p>Kegiatan berlokasi di Kelurahan Tambakrejo, Kecamatan Gayamsari, Kota Semarang, Jawa Tengah, yang berada pada koordinat 6°56’–6°58’ LS dan 110°25’–110°27’ BT.</p>
+    </div>
+
+    <!-- WHO -->
+    <div class="w1h-box">
+      <h3>Who</h3>
+      <p>Kegiatan ini ditujukan untuk pemerintah daerah, masyarakat Tambakrejo, serta pemangku kepentingan yang membutuhkan informasi spasial sebagai dasar pengambilan keputusan dalam mitigasi dan penataan ruang.</p>
+    </div>
+
+    <!-- WHEN -->
+    <div class="w1h-box">
+      <h3>When</h3>
+      <p>Kegiatan dilakukan pada tahun 2025 berdasarkan kondisi eksisting serta data hidrometeorologi tahun tersebut.</p>
+    </div>
+
+    <!-- HOW -->
+    <div class="w1h-box">
+      <h3>How</h3>
+      <p>Kegiatan dilaksanakan melalui pengumpulan dan pengolahan data curah hujan, DEM, penggunaan lahan, jarak sungai, dan jenis tanah; dilanjutkan dengan analisis buffer, scoring, pembobotan, dan overlay untuk menghasilkan peta kerentanan banjir serta penyajiannya dalam platform WebGIS.</p>
+    </div>
+
+  <div class="btn-group">
+    <button class="story-btn-primary" onclick="goToMapAndFocus('banjir')">Lihat di Peta</button>
+    <button class="story-btn-secondary" onclick="showSection('info')">Kembali</button>
+  </div>
+</section>
+<!-- MAP -->
+<section id="map" class="map-section">
+  <div class="map-wrapper">
+
+    <aside class="map-panel">
+      
+      <style>
+        /* Style untuk kotak navigasi */
+        .nav-btn {
+          text-decoration: none;
+          color: white;
+          font-weight: 600;
+          font-size: 13px; /* Sedikit diperkecil agar muat */
+          
+          /* KOTAK PEMBATAS */
+          border: 1px solid rgba(255, 255, 255, 0.6); /* Garis tepi putih transparan */
+          padding: 8px 16px; /* Jarak antara teks dan garis tepi */
+          border-radius: 6px; /* Membuat sudut kotak sedikit melengkung */
+          background-color: rgba(255, 255, 255, 0.1); /* Latar belakang sedikit putih transparan */
+          transition: all 0.3s ease; /* Efek halus saat disentuh */
+        }
+
+        /* Efek saat mouse diarahkan (Hover) */
+        .nav-btn:hover {
+          background-color: white;
+          color: #017686; /* Warna teks berubah jadi hijau teal */
+          border-color: white;
+        }
+
+        /* Opsi: Kelas untuk tombol yang sedang aktif (misal Kerentanan DBD) */
+        .nav-btn.active {
+          background-color: white;
+          color: #017686;
+          border-color: white;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+      </style>
+
+      <div style="position:sticky; top:0; z-index:10; background:linear-gradient(45deg,#017686,#0c9e6b); padding:15px; margin:0px -20px 20px -20px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+        
+        <div style="display:flex; gap:10px; overflow-x:auto; white-space:nowrap; align-items:center; padding-bottom: 5px;">
+          
+          <a href="#panel-Kerentanan DBD" class="nav-btn active">Kerentanan DBD</a>
+          
+          <a href="#panel-Persebaran UMKM" class="nav-btn">Persebaran UMKM</a>
+          <a href="#panel-Persebaran TPS3R" class="nav-btn">Persebaran TPS3R</a>
+          <a href="#panel-Kerentanan Banjir" class="nav-btn">Kerentanan Banjir</a>
+          <a href="#panel-Resapan Air" class="nav-btn">Resapan Air</a>
+          
+        </div>
+      </div>
+
+<div id="panel-Kerentanan DBD" style="margin-bottom:40px;">
+  
+  <h3 style="font-family: 'Poppins', sans-serif; font-weight: 700;">Kerentanan DBD</h3>
+  
+  <div style="background-color: #f8fcfd; border-left: 5px solid #017686; padding: 15px; border-radius: 0 8px 8px 0; margin-bottom: 20px;">
+    <p style="margin: 0; text-align: justify; line-height: 1.6; color: #444; font-size: 14px; font-family: 'Poppins', sans-serif;">
+      Peta kerentanan penyakit DBD di <strong>Kelurahan Tambakrejo</strong> menggambarkan tingkat risiko kesehatan dengan memperhitungkan aspek fisik, sosial, dan aksesibilitas.
+      <br><br>
+      Berdasarkan analisis spasial, wilayah ini terbagi menjadi 3 zona:
+      <span style="color: #198754; font-weight: 600;">Zona Aman (Rendah)</span>,
+      <span style="color: #fd7e14; font-weight: 600;">Waspada (Sedang)</span>, dan
+      <span style="color: #dc3545; font-weight: 600;">Bahaya (Tinggi)</span>, yang tersebar di 9 RW.
+    </p>
+  </div>
+
+  <div style="background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e0e0e0; margin-bottom: 30px;">
+    
+    <div style="text-align: center; margin-bottom: 10px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
+      <h4 style="margin: 0; font-family: 'Poppins', sans-serif; font-weight: 800; color: #017686; letter-spacing: 1px; text-transform: uppercase;">
+        JUMLAH RW PER ZONA
+      </h4>
+    </div>
+    
+    <div id="dbd3DChart" style="height: 300px; width: 100%;"></div>
+
+  </div>
+
+  <div style="margin-bottom: 30px;">
+    <h4 style="font-family: 'Poppins', sans-serif; font-weight: 700; color: #333; margin-bottom: 15px; border-left: 4px solid #017686; padding-left: 10px;">
+      DATA KEPENDUDUKAN
+    </h4>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+      
+      <div style="background: #e3f2fd; padding: 15px; border-radius: 10px; text-align: center;">
+        <span style="display: block; font-size: 24px;">👥</span>
+        <span style="display: block; font-family: 'Poppins', sans-serif; font-weight: 600; color: #1565c0; font-size: 18px;">10.429</span>
+        <span style="display: block; font-family: 'Poppins', sans-serif; font-size: 12px; color: #555;">Total Penduduk</span>
+      </div>
+
+      <div style="background: #fff3e0; padding: 15px; border-radius: 10px; text-align: center;">
+        <span style="display: block; font-size: 24px;">🏠</span>
+        <span style="display: block; font-family: 'Poppins', sans-serif; font-weight: 600; color: #ef6c00; font-size: 18px;">3.481</span>
+        <span style="display: block; font-family: 'Poppins', sans-serif; font-size: 12px; color: #555;">Kepala Keluarga</span>
+      </div>
+
+      <div style="background: #f1f8e9; padding: 15px; border-radius: 10px; text-align: center;">
+        <span style="display: block; font-size: 24px;">👨</span>
+        <span style="display: block; font-family: 'Poppins', sans-serif; font-weight: 600; color: #2e7d32; font-size: 18px;">5.146</span>
+        <span style="display: block; font-family: 'Poppins', sans-serif; font-size: 12px; color: #555;">Laki - Laki</span>
+      </div>
+
+      <div style="background: #fce4ec; padding: 15px; border-radius: 10px; text-align: center;">
+        <span style="display: block; font-size: 24px;">👩</span>
+        <span style="display: block; font-family: 'Poppins', sans-serif; font-weight: 600; color: #c2185b; font-size: 18px;">5.283</span>
+        <span style="display: block; font-family: 'Poppins', sans-serif; font-size: 12px; color: #555;">Perempuan</span>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <h4 style="font-family: 'Poppins', sans-serif; font-weight: 700; color: #333; margin-bottom: 15px; border-left: 4px solid #017686; padding-left: 10px;">
+      FASILITAS KESEHATAN
+    </h4>
+    
+    <div style="background: #fff; border: 1px solid #e0e0e0; border-radius: 10px; padding: 15px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+      <div style="width: 50px; height: 50px; background: #e0f2f1; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #00897b; font-size: 24px;">
+        🏥
+      </div>
+      <div>
+        <h5 style="margin: 0; font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: #333;">PUSKESMAS</h5>
+        <p style="margin: 5px 0 0 0; font-family: 'Poppins', sans-serif; font-size: 13px; color: #666;">
+          Terdapat <strong>1 unit</strong> Puskesmas yang melayani warga Kelurahan Tambakrejo.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      Highcharts.chart('dbd3DChart', {
+        chart: {
+          type: 'column', 
+          options3d: {
+            enabled: true,
+            alpha: 10, 
+            beta: 25,  
+            depth: 70  
+          },
+          backgroundColor: 'transparent'
+        },
+        title: { text: null },
+        xAxis: {
+          categories: ['Rendah', 'Sedang', 'Tinggi'], 
+          labels: {
+            style: { fontFamily: 'Poppins, sans-serif', fontWeight: 'bold' }
+          }
+        },
+        yAxis: {
+          title: { text: 'Jumlah RW', style: { fontFamily: 'Poppins, sans-serif' } },
+          allowDecimals: false 
+        },
+        tooltip: {
+          headerFormat: '<b>Tingkat {point.key}</b><br>',
+          pointFormat: 'Jumlah: {point.y} RW'
+        },
+        plotOptions: {
+          column: {
+            depth: 25,
+            colorByPoint: true, 
+            dataLabels: {
+              enabled: true,
+              format: '{point.y} RW',
+              style: { fontFamily: 'Poppins, sans-serif', fontSize: '12px', color: '#444' }
+            }
+          }
+        },
+        series: [{
+          name: 'Jumlah RW',
+          data: [
+            { y: 1, color: '#198754' }, // Hijau (Rendah) - Sesuai gambar
+            { y: 3, color: '#fd7e14' }, // Orange (Sedang) - Sesuai gambar
+            { y: 5, color: '#dc3545' }  // Merah (Tinggi) - Sesuai gambar
+          ],
+          showInLegend: false 
+        }],
+        credits: { enabled: false }
+      });
+    });
+  </script>
+</div>
+
+      <div id="panel-Persebaran UMKM" style="margin-bottom:40px;">
+  
+  <h3 style="font-family: 'Poppins', sans-serif; font-weight: 700;">Persebaran UMKM</h3>
+  
+  <div style="background-color: #f8fcfd; border-left: 5px solid #017686; padding: 15px; border-radius: 0 8px 8px 0; margin-bottom: 20px;">
+    <p style="margin: 0; text-align: justify; line-height: 1.6; color: #444; font-size: 14px; font-family: 'Poppins', sans-serif;">
+      Sebagai jantung ekonomi lokal di Kecamatan Gayamsari, <strong>Kelurahan Tambakrejo</strong> memiliki ekosistem UMKM yang dinamis dan berpotensi besar. 
+      <br><br>
+      Didominasi oleh semangat kemandirian, roda perekonomian warga terus berputar melalui berbagai sektor strategis, mulai dari 
+      <span style="color: #2f67b1; font-weight: 600;">Kuliner</span>, 
+      <span style="color: #e0752f; font-weight: 600;">Jasa</span>, hingga 
+      <span style="color: #fcc100; font-weight: 600;">Perdagangan</span>, yang menjadi tumpuan kesejahteraan masyarakat setempat.
+    </p>
+  </div>
+
+  <div style="background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e0e0e0; margin-bottom: 30px;">
+    
+    <div style="text-align: center; margin-bottom: 10px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
+      <h4 style="margin: 0; font-family: 'Poppins', sans-serif; font-weight: 800; color: #017686; letter-spacing: 1px; text-transform: uppercase;">
+        JENIS UMKM
+      </h4>
+    </div>
+    
+    <div id="umkm3DChart" style="height: 300px; width: 100%;"></div>
+
+    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+      <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; font-family: 'Poppins', sans-serif; font-size: 12px; color: #444;">
+        <div style="display: flex; align-items: center;">
+          <span style="width: 12px; height: 12px; background-color: #2f67b1; border-radius: 50%; display: inline-block; margin-right: 6px;"></span>
+          <span>Kuliner (53.85%)</span>
+        </div>
+        <div style="display: flex; align-items: center;">
+          <span style="width: 12px; height: 12px; background-color: #e0752f; border-radius: 50%; display: inline-block; margin-right: 6px;"></span>
+          <span>Jasa (30.77%)</span>
+        </div>
+        <div style="display: flex; align-items: center;">
+          <span style="width: 12px; height: 12px; background-color: #a5a5a5; border-radius: 50%; display: inline-block; margin-right: 6px;"></span>
+          <span>Kelontong (7.69%)</span>
+        </div>
+        <div style="display: flex; align-items: center;">
+          <span style="width: 12px; height: 12px; background-color: #fcc100; border-radius: 50%; display: inline-block; margin-right: 6px;"></span>
+          <span>Material (7.69%)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <h4 style="font-family: 'Poppins', sans-serif; font-weight: 700; color: #333; margin-bottom: 15px; border-left: 4px solid #017686; padding-left: 10px;">
+      DETAIL JUMLAH UNIT
+    </h4>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+
+      <div style="background-color: #e3f2fd; border: 1px solid #bbdefb; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+        <div style="width: 45px; height: 45px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+          🍜
+        </div>
+        <span style="font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 700; color: #1565c0; line-height: 1;">14</span>
+        <span style="font-family: 'Poppins', sans-serif; font-size: 11px; color: #555; margin-top: 4px;">Makanan & Minuman</span>
+      </div>
+
+      <div style="background-color: #fff3e0; border: 1px solid #ffe0b2; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+        <div style="width: 45px; height: 45px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+          🛠️
+        </div>
+        <span style="font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 700; color: #ef6c00; line-height: 1;">8</span>
+        <span style="font-family: 'Poppins', sans-serif; font-size: 11px; color: #555; margin-top: 4px;">Jasa / Layanan</span>
+      </div>
+
+      <div style="background-color: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+        <div style="width: 45px; height: 45px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+          🏪
+        </div>
+        <span style="font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 700; color: #616161; line-height: 1;">2</span>
+        <span style="font-family: 'Poppins', sans-serif; font-size: 11px; color: #555; margin-top: 4px;">Toko Kelontong</span>
+      </div>
+
+      <div style="background-color: #fffde7; border: 1px solid #fff9c4; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+        <div style="width: 45px; height: 45px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+          🧱
+        </div>
+        <span style="font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 700; color: #fbc02d; line-height: 1;">2</span>
+        <span style="font-family: 'Poppins', sans-serif; font-size: 11px; color: #555; margin-top: 4px;">Toko Material</span>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      Highcharts.chart('umkm3DChart', {
+        chart: {
+          type: 'pie',
+          options3d: { enabled: true, alpha: 45, beta: 0 },
+          backgroundColor: 'transparent',
+          marginBottom: 0 
+        },
+        title: { text: null },
+        tooltip: { pointFormat: 'Jumlah: <b>{point.percentage:.2f}%</b>' },
+        plotOptions: {
+          pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            depth: 45,
+            dataLabels: {
+              enabled: true,
+              format: '<b>{point.name}</b>',
+              distance: 10,
+              style: { fontSize: '11px', fontFamily: 'Poppins, sans-serif', color: '#666' }
+            },
+            showInLegend: false
+          }
+        },
+        series: [{
+          name: 'Persentase',
+          data: [
+            { name: 'Kuliner', y: 53.85, color: '#2f67b1' },
+            { name: 'Jasa', y: 30.77, color: '#e0752f' },
+            { name: 'Kelontong', y: 7.69, color: '#a5a5a5' },
+            { name: 'Material', y: 7.69, color: '#fcc100' }
+          ]
+        }],
+        credits: { enabled: false }
+      });
+    });
+  </script>
+</div>
+
+<div id="panel-TPS3R" style="margin-bottom:40px;">
+  
+  <h3 style="font-family: 'Poppins', sans-serif; font-weight: 700;">Persebaran TPS3R</h3>
+  
+  <div style="background-color: #fffde7; border-left: 5px solid #fbc02d; padding: 15px; border-radius: 0 8px 8px 0; margin-bottom: 25px;">
+    <h4 style="margin: 0 0 10px 0; font-family: 'Poppins', sans-serif; font-weight: 700; color: #f57f17; font-size: 15px;">
+      APA ITU TPS 3R?
+    </h4>
+    <p style="margin: 0; text-align: justify; line-height: 1.6; color: #444; font-size: 13px; font-family: 'Poppins', sans-serif;">
+      <strong>TPS 3R</strong> adalah tempat pengelolaan sampah di lingkungan warga dengan prinsip:
+      <br>
+      <span style="color: #2e7d32; font-weight: 600;">♻️ Reduce</span> (Mengurangi)<br>
+      <span style="color: #1565c0; font-weight: 600;">🔄 Reuse</span> (Menggunakan Kembali)<br>
+      <span style="color: #ef6c00; font-weight: 600;">🛠️ Recycle</span> (Mendaur Ulang)<br>
+      <br>
+      Fasilitas ini membantu mengurangi jumlah sampah yang dibuang ke TPA, sehingga lingkungan menjadi lebih bersih dan sehat.
+    </p>
+  </div>
+
+  <div style="background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e0e0e0; margin-bottom: 25px;">
+    
+    <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
+      <h4 style="margin: 0; font-family: 'Poppins', sans-serif; font-weight: 800; color: #017686; letter-spacing: 1px; text-transform: uppercase;">
+        PARAMETER PENENTUAN LOKASI
+      </h4>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 25px;">
+
+      <div>
+        <div style="background-color: #ffebee; border-left: 5px solid #d32f2f; padding: 10px 15px; border-radius: 5px; margin-bottom: 15px;">
+          <h5 style="margin: 0; font-family: 'Poppins', sans-serif; font-weight: 700; color: #c62828; font-size: 14px;">
+            📜 BERDASARKAN REGULASI
+          </h5>
+        </div>
+        <div style="display: grid; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 10px; font-family: 'Poppins', sans-serif; font-size: 13px; color: #555;">
+            <span style="background: #ffebee; color: #d32f2f; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; font-weight: bold;">1</span>
+            <span>Jarak thd <strong>Rel Kereta Api</strong></span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; font-family: 'Poppins', sans-serif; font-size: 13px; color: #555;">
+            <span style="background: #ffebee; color: #d32f2f; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; font-weight: bold;">2</span>
+            <span>Jarak thd <strong>Bangunan Industri</strong></span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; font-family: 'Poppins', sans-serif; font-size: 13px; color: #555;">
+            <span style="background: #ffebee; color: #d32f2f; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; font-weight: bold;">3</span>
+            <span>Jarak thd <strong>Badan Air</strong></span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; font-family: 'Poppins', sans-serif; font-size: 13px; color: #555;">
+            <span style="background: #ffebee; color: #d32f2f; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; font-weight: bold;">4</span>
+            <span>Jarak thd <strong>TPS Sementara</strong></span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; font-family: 'Poppins', sans-serif; font-size: 13px; color: #555;">
+            <span style="background: #ffebee; color: #d32f2f; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; font-weight: bold;">5</span>
+            <span>Jarak thd <strong>Fasum Sensitif</strong></span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; font-family: 'Poppins', sans-serif; font-size: 13px; color: #555;">
+            <span style="background: #ffebee; color: #d32f2f; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; font-weight: bold;">6</span>
+            <span>Jarak thd <strong>Pemukiman</strong></span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; font-family: 'Poppins', sans-serif; font-size: 13px; color: #555;">
+            <span style="background: #ffebee; color: #d32f2f; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; font-weight: bold;">7</span>
+            <span>Ketersediaan <strong>Luas Lahan</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="background-color: #fff8e1; border-left: 5px solid #ffa000; padding: 10px 15px; border-radius: 5px; margin-bottom: 15px;">
+          <h5 style="margin: 0; font-family: 'Poppins', sans-serif; font-weight: 700; color: #e65100; font-size: 14px;">
+            🤝 PREFERENSI MASYARAKAT
+          </h5>
+        </div>
+        <div style="display: grid; gap: 10px;">
+          <div style="background: #fff8e1; padding: 10px; border-radius: 8px; border: 1px solid #ffe0b2; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 20px;">🛣️</span>
+            <span style="font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; color: #555;">Dekat Jalan Utama</span>
+          </div>
+          <div style="background: #fff8e1; padding: 10px; border-radius: 8px; border: 1px solid #ffe0b2; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 20px;">☮️</span>
+            <span style="font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; color: #555;">Minim Potensi Konflik</span>
+          </div>
+          <div style="background: #fff8e1; padding: 10px; border-radius: 8px; border: 1px solid #ffe0b2; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 20px;">🏪</span>
+            <span style="font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; color: #555;">Kedekatan dgn UMKM</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="background-color: #fff9c4; border: 1px solid #fff59d; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #fbc02d; padding-bottom: 10px;">
+      <span style="font-size: 24px;">📊</span>
+      <h4 style="margin: 0; font-family: 'Poppins', sans-serif; font-weight: 800; color: #f57f17; font-size: 16px; letter-spacing: 0.5px;">
+        ANALISIS KESESUAIAN LAHAN
+      </h4>
+    </div>
+    
+    <p style="margin: 0; text-align: justify; line-height: 1.7; color: #333; font-size: 13px; font-family: 'Poppins', sans-serif;">
+      Wilayah Tambakrejo didominasi <strong style="color: #d32f2f;">zona tidak sesuai</strong> untuk TPS 3R dikarenakan permukiman padat, kedekatan dengan badan air, dan kerentanan banjir.
+      <br><br>
+      <strong style="color: #d32f2f;">Zona sesuai</strong> hanya terdapat di <strong style="color: #d32f2f;">RW 03, RW 04, RW 07, dan RW 01</strong>, yang telah memenuhi <strong style="color: #d32f2f;">parameter regulasi dan kecukupan lahan</strong>.
+      <br><br>
+      Validasi <strong>Bhumi ATR/BPN</strong> menemukan beberapa lahan terbuka milik pemerintah yang <strong style="color: #d32f2f;">berpotensi digunakan</strong>, meski perlu verifikasi lapangan lebih lanjut. <strong style="color: #d32f2f;">Preferensi masyarakat</strong> juga menguatkan ketiga RW tersebut dengan <strong style="color: #d32f2f;">area sesuai yang lebih luas</strong>.
+    </p>
+  </div>
+
+</div>
+<div id="panel-Kerentanan Banjir" style="margin-bottom:40px;">
+  
+  <h3 style="font-family: 'Poppins', sans-serif; font-weight: 700;">Kerentanan Banjir</h3>
+  
+  <div style="background-color: #f8fcfd; border-left: 5px solid #017686; padding: 15px; border-radius: 0 8px 8px 0; margin-bottom: 25px;">
+    <p style="margin: 0; text-align: justify; line-height: 1.6; color: #444; font-size: 13px; font-family: 'Poppins', sans-serif;">
+      <strong>Perubahan lahan</strong> di Tambakrejo dari area terbuka menjadi kawasan terbangun menurunkan daya resap dan meningkatkan limpasan, sehingga banjir dan luapan <span style="color: #017686; font-weight: 600;">Banjir Kanal Timur (BKT)</span> semakin sering terjadi, terutama saat hujan lebat bersamaan dengan pasang laut.
+      <br><br>
+      Analisis spasial dengan <em>buffer</em> dan <em>overlay</em> mengintegrasikan penggunaan lahan, tanah, curah hujan, kelerengan, dan jarak sungai untuk memetakan area rawan.
+    </p>
+  </div>
+
+  <div style="background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e0e0e0; margin-bottom: 30px;">
+    
+    <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
+      <h4 style="margin: 0; font-family: 'Poppins', sans-serif; font-weight: 800; color: #017686; letter-spacing: 1px; text-transform: uppercase;">
+        PARAMETER PENDUKUNG
+      </h4>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 15px;">
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <div style="min-width: 45px; height: 45px; background: #e0f7fa; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #006064; font-size: 20px;">🌧️</div>
+        <div>
+          <span style="display: block; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 13px; color: #333;">Curah Hujan</span>
+          <span style="display: block; font-family: 'Poppins', sans-serif; font-size: 12px; color: #666;">3000 - 3500 mm/tahun</span>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <div style="min-width: 45px; height: 45px; background: #f1f8e9; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #33691e; font-size: 20px;">🌱</div>
+        <div>
+          <span style="display: block; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 13px; color: #333;">Jenis Tanah</span>
+          <span style="display: block; font-family: 'Poppins', sans-serif; font-size: 12px; color: #666;">Aluvial</span>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <div style="min-width: 45px; height: 45px; background: #fff3e0; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #e65100; font-size: 20px;">📐</div>
+        <div>
+          <span style="display: block; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 13px; color: #333;">Kemiringan Lereng</span>
+          <span style="display: block; font-family: 'Poppins', sans-serif; font-size: 12px; color: #666;">Datar (0 - 2%)</span>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <div style="min-width: 45px; height: 45px; background: #e3f2fd; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0d47a1; font-size: 20px;">🌊</div>
+        <div>
+          <span style="display: block; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 13px; color: #333;">Jarak Sungai</span>
+          <span style="display: block; font-family: 'Poppins', sans-serif; font-size: 12px; color: #666;">Terhadap Pemukiman</span>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <div style="min-width: 45px; height: 45px; background: #f3e5f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #4a148c; font-size: 20px;">🏘️</div>
+        <div>
+          <span style="display: block; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 13px; color: #333;">Penggunaan Lahan</span>
+          <span style="display: block; font-family: 'Poppins', sans-serif; font-size: 12px; color: #666;">Area Terbangun, Vegetaasi, Lahan Terbuka, dll</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <h4 style="font-family: 'Poppins', sans-serif; font-weight: 700; color: #333; margin-bottom: 15px; border-left: 4px solid #333; padding-left: 10px;">
+      DETAIL ZONASI AREA
+    </h4>
+
+    <div style="background-color: #fff5f5; border: 1px solid #ffcdd2; border-left: 5px solid #d32f2f; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+      <h5 style="margin: 0 0 8px 0; color: #d32f2f; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 15px;">
+        🔴 ZONA MERAH (Tinggi)
+      </h5>
+      <p style="margin: 0; font-family: 'Poppins', sans-serif; font-size: 13px; color: #444; line-height: 1.6; text-align: justify;">
+        Area genangan paling parah yang mencakup <strong>RT 03-05</strong>. Wilayah ini berada pada elevasi sangat rendah, memiliki cekungan mikro, dan dekat dengan Banjir Kanal Timur serta memiliki drainase terbatas. Zona ini menjadi titik akumulasi air utama saat hujan ekstrem terjadi.
+      </p>
+    </div>
+
+    <div style="background-color: #fffde7; border: 1px solid #fff9c4; border-left: 5px solid #fbc02d; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+      <h5 style="margin: 0 0 8px 0; color: #f57f17; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 15px;">
+        🟡 ZONA KUNING (Sedang)
+      </h5>
+      <p style="margin: 0; font-family: 'Poppins', sans-serif; font-size: 13px; color: #444; line-height: 1.6; text-align: justify;">
+        Area permukiman padat dan kawasan transisi. Pada kondisi hujan ekstrem, saluran sekunder yang mengalami sedimentasi cepat melampaui kapasitasnya, sehingga genangan meluas ke wilayah yang biasanya hanya terdampak ringan.
+      </p>
+    </div>
+
+    <div style="background-color: #e8f5e9; border: 1px solid #c8e6c9; border-left: 5px solid #388e3c; padding: 15px; border-radius: 8px;">
+      <h5 style="margin: 0 0 8px 0; color: #2e7d32; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 15px;">
+        🟢 ZONA HIJAU (Rendah)
+      </h5>
+      <p style="margin: 0; font-family: 'Poppins', sans-serif; font-size: 13px; color: #444; line-height: 1.6; text-align: justify;">
+        Terletak pada elevasi lebih tinggi dan dilayani oleh drainase primer yang lebih baik. Wilayah ini menunjukkan stabilitas terhadap genangan dengan risiko banjir relatif minimal, namun tetap perlu antisipasi jika volume limpasan area sekitar meningkat signifikan.
+      </p>
+    </div>
+
+  </div>
+
+</div>
+
+<div id="panel-Resapan Air" style="margin-bottom:40px;">
+  
+  <h3 style="font-family: 'Poppins', sans-serif; font-weight: 700;">Resapan Air & Drainase</h3>
+
+  <div style="background-color: #e1f5fe; border-left: 5px solid #0288d1; padding: 15px; border-radius: 0 8px 8px 0; margin-bottom: 20px;">
+    <h4 style="margin: 0 0 10px 0; font-family: 'Poppins', sans-serif; font-weight: 700; color: #01579b; font-size: 14px;">
+      💧 KONDISI AREA RESAPAN
+    </h4>
+    <p style="margin: 0; text-align: justify; line-height: 1.6; color: #444; font-size: 13px; font-family: 'Poppins', sans-serif;">
+      Tambakrejo didominasi <strong>area resapan sedang-buruk</strong> pada permukiman padat, sehingga air sulit meresap dan mudah menimbulkan genangan.
+      <br><br>
+      Area resapan baik hanya terdapat pada <strong>ruang terbuka dan kawasan bervegetasi</strong> yang jumlahnya terbatas.
+    </p>
+  </div>
+
+  <div style="background-color: #fff3e0; border-left: 5px solid #ef6c00; padding: 15px; border-radius: 0 8px 8px 0; margin-bottom: 30px;">
+    <h4 style="margin: 0 0 10px 0; font-family: 'Poppins', sans-serif; font-weight: 700; color: #e65100; font-size: 14px;">
+      ⚠️ TANTANGAN INFRASTRUKTUR
+    </h4>
+    <p style="margin: 0; text-align: justify; line-height: 1.6; color: #444; font-size: 13px; font-family: 'Poppins', sans-serif;">
+      Kinerja drainase belum optimal akibat kombinasi faktor: rendahnya daya resap, sedimentasi saluran, penumpukan sampah, dan peningkatan volume limbah domestik.
+    </p>
+  </div>
+
+  <div style="background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e0e0e0; margin-bottom: 25px;">
+    
+    <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
+      <h4 style="margin: 0; font-family: 'Poppins', sans-serif; font-weight: 800; color: #017686; letter-spacing: 1px; text-transform: uppercase;">
+        DEBIT AIR SUNGAI (2024)
+      </h4>
+      <small style="display:block; font-family: 'Poppins', sans-serif; font-size: 11px; color: #888; margin-top: 5px;">
+        Perbandingan Rata-rata Bulanan (m³/detik)
+      </small>
+    </div>
+
+    <div id="riverDebitChart" style="height: 300px; width: 100%;"></div>
+
+  </div>
+
+  <div>
+    <h4 style="font-family: 'Poppins', sans-serif; font-weight: 700; color: #333; margin-bottom: 15px; border-left: 4px solid #017686; padding-left: 10px;">
+      KAPASITAS TAMPUNG MAKSIMUM
+    </h4>
+
+    <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
+      
+      <div style="background-color: #f1f8e9; border: 1px solid #c5e1a5; border-radius: 10px; padding: 15px; display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+          <div style="background: #fff; padding: 8px; border-radius: 50%; color: #558b2f; font-size: 20px;">🌊</div>
+          <div>
+            <span style="display: block; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 14px; color: #33691e;">Sungai Tenggang</span>
+            <span style="display: block; font-family: 'Poppins', sans-serif; font-size: 11px; color: #558b2f;">Kapasitas Maksimal</span>
+          </div>
+        </div>
+        <div style="text-align: right;">
+          <span style="display: block; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 18px; color: #33691e;">45 - 65</span>
+          <span style="display: block; font-family: 'Poppins', sans-serif; font-size: 10px; color: #555;">m³/detik</span>
+        </div>
+      </div>
+
+      <div style="background-color: #e3f2fd; border: 1px solid #90caf9; border-radius: 10px; padding: 15px; display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+          <div style="background: #fff; padding: 8px; border-radius: 50%; color: #1565c0; font-size: 20px;">🌊</div>
+          <div>
+            <span style="display: block; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 14px; color: #0d47a1;">Banjir Kanal Timur</span>
+            <span style="display: block; font-family: 'Poppins', sans-serif; font-size: 11px; color: #1565c0;">Kapasitas Maksimal</span>
+          </div>
+        </div>
+        <div style="text-align: right;">
+          <span style="display: block; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 18px; color: #0d47a1;">65 - 130</span>
+          <span style="display: block; font-family: 'Poppins', sans-serif; font-size: 10px; color: #555;">m³/detik</span>
+        </div>
+      </div>
+
+    </div>
+    
+    <p style="margin: 15px 0 0 0; font-size: 11px; color: #666; font-style: italic; text-align: center;">
+      *Data berdasarkan BBWS Pemali Juana (2024)
+    </p>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      Highcharts.chart('riverDebitChart', {
+        chart: {
+          type: 'spline', // Grafik garis halus
+          backgroundColor: 'transparent',
+          style: { fontFamily: 'Poppins, sans-serif' }
+        },
+        title: { text: null },
+        xAxis: {
+          categories: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+          crosshair: true,
+          labels: { style: { fontSize: '10px' } }
+        },
+        yAxis: {
+          title: { text: 'Debit (m³/s)', style: { color: '#666' } },
+          gridLineDashStyle: 'Dash'
+        },
+        tooltip: {
+          shared: true,
+          valueSuffix: ' m³/s',
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          borderColor: '#ccc',
+          borderRadius: 8,
+          shadow: true
+        },
+        plotOptions: {
+          spline: {
+            marker: { radius: 3, symbol: 'circle' },
+            lineWidth: 2
+          }
+        },
+        series: [
+          {
+            name: 'Banjir Kanal Timur',
+            // Data dari tabel image_be9720.png
+            data: [66.48, 64.51, 85.97, 64.95, 60.38, 58.45, 60.13, 57.76, 60.13, 60.78, 61.14, 62.32],
+            color: '#1565c0' // Biru Tua
+          },
+          {
+            name: 'Sungai Tenggang',
+            // Data dari tabel image_be96e4.png
+            data: [42.02, 41.52, 45.14, 44.58, 41.76, 39.10, 38.22, 36.84, 39.37, 40.76, 42.32, 41.19],
+            color: '#558b2f', // Hijau
+            dashStyle: 'ShortDot' // Garis putus-putus untuk membedakan
+          }
+        ],
+        legend: {
+          itemStyle: { fontWeight: '600', fontSize: '11px' }
+        },
+        credits: { enabled: false }
+      });
+    });
+  </script>
+</div>
+    </aside>
+
+    <div id="mapView"></div>
+
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div id="page-faq">
+    <details>
+      <summary>Bagaimana cara membuka peta?</summary>
+      <p>Klik menu sesuai tema, lalu peta akan terbuka otomatis.</p>
+    </details>
+
+    <details>
+      <summary>Bagaimana cara zoom in/zoom out?</summary>
+      <p>Gunakan scroll mouse atau tombol zoom di kiri peta.</p>
+    </details>
+
+    <details>
+      <summary>Apa fungsi WebGIS ini?</summary>
+      <p>Untuk menampilkan visualisasi data spasial hasil survei di Tambakrejo.</p>
+    </details>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-container">
+
+    <div class="about-box">
+      <h2>Tentang Kelurahan Tambakrejo</h2>
+
+      <p>
+        Kelurahan Tambakrejo di Kecamatan Gayamsari, Kota Semarang, berada
+        pada koordinat 6°56’–6°58’ LS dan 110°25’–110°27’ BT, dengan luas sekitar
+        74,75 hektare, elevasi rendah ±5 mdpl, dan topografi dataran rendah yang
+        dipengaruhi curah hujan rata-rata 329 mm/tahun serta suhu 24–34°C.
+        Tambakrejo berbatasan dengan Kelurahan Kemijen di barat, Terboyo Kulon di
+        utara dan timur, serta Kaligawe di selatan. Secara demografis, wilayah ini
+        dihuni oleh 10.429 jiwa dengan 3.481 KK, 54 RT, dan 9 RW.
+      </p>
+    </div>
+
+    <img 
+      src="https://raw.githubusercontent.com/fitriayusalafi/TAMBAKREJO/f50d1391624ec4dbe14fc6f8e23b02aecd1ed88d/FOTO%20UDARA.png" 
+      class="about-image"
+    >
+
+  </div>
+</section>
+
+<!-- LAYER -->
+<div id="layerWrapper">
+  <button id="layerBtn" onclick="toggleLayerMenu()">Layer</button>
+
+  <div id="layerMenu">
+    <label><input type="checkbox" onclick="toggleLayer('tps3r')"> TPS 3R</label>
+    <label><input type="checkbox" onclick="toggleLayer('dbd')"> Kerentanan DBD</label>
+    <label><input type="checkbox" onclick="toggleLayer('banjir')"> Banjir</label>
+    
+    <hr>
+    <label>
+        <input type="checkbox" onclick="toggleGroup('drainase_all')"> 
+        <strong>Semua Drainase</strong> (Baik & Buruk)
+    </label>
+    
+    <label>
+        <input type="checkbox" onclick="toggleGroup('umkm_all')"> 
+        <strong>Semua UMKM</strong> (Kuliner, Jasa, dll)
+    </label>
+</div>
+
+
+<script src="https://raw.githack.com/fitriayusalafi/TAMBAKREJO/master/ADMINISTRASI_DESA_11.js"></script>
+<script src="https://raw.githack.com/fitriayusalafi/TAMBAKREJO/master/Drainase_baik_5.js"></script> 
+<script src="https://raw.githack.com/fitriayusalafi/TAMBAKREJO/master/dbd1_1.js"></script> 
+<script src="https://raw.githack.com/fitriayusalafi/TAMBAKREJO/master/tps3r_0.js"></script> 
+<script src="https://raw.githack.com/fitriayusalafi/TAMBAKREJO/master/KERENTANANBANJIR_10.js"></script> 
+<script src="https://raw.githack.com/fitriayusalafi/TAMBAKREJO/master/UMKMJASA_3.js"></script> 
+<script src="https://raw.githack.com/fitriayusalafi/TAMBAKREJO/master/UMKMKLONTONG_2.js"></script>
+<script src="https://raw.githack.com/fitriayusalafi/TAMBAKREJO/master/UMKMMAKANANMINUMAN_4.js"></script>
+<script src="https://raw.githack.com/fitriayusalafi/TAMBAKREJO/master/UMKMMATERIAL_1.js"></script>
+<script src="https://raw.githack.com/fitriayusalafi/TAMBAKREJO/master/Drainase_buruk_6.js"></script>
+
+<script>
+  // --- 1. INISIALISASI PETA ---
+const map = L.map('mapView').setView([-6.955, 110.445], 15);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+// Administrasi Desa (Selalu Muncul sebagai Dasar)
+if (window.json_ADMINISTRASI_DESA_11) {
+    L.geoJSON(json_ADMINISTRASI_DESA_11, {
+        style: { color: "#333", weight: 2, fillOpacity: 0, dashArray: '5, 5' }
+    }).addTo(map);
+}
+
+// --- 3. INISIALISASI SEMUA LAYER ---
+var layers = {};
+
+// DBD
+layers.dbd = window.json_dbd1_1
+  ? L.geoJSON(json_dbd1_1, {
+      style: styleDBD
+    })
+  : null;
+function styleDBD(feature) {
+  const tingkat = feature.properties.KET_AKHIR;
+
+  return {
+    fillColor:
+      tingkat === 'Tinggi' ? '#ff0000ff' :   // Merah
+      tingkat === 'Sedang' ? '#ffee00ff' :   // Oranye
+      tingkat === 'Rendah' ? '#2e7d32' :   // Hijau
+      '#d47115ff',                           // Default
+    weight: 1,
+    opacity: 1,
+    color: 'white',
+    fillOpacity: 0.7
+  };
+}
+// TPS3R
+layers.tps3r = window.json_tps3r_0
+  ? L.geoJSON(json_tps3r_0, {
+      style: styletps3r
+    })
+  : null;
+function styletps3r(feature) {
+  const tingkat = feature.properties.Keterang_7;
+
+  return {
+    fillColor:
+      tingkat === 'Sesuai' ? '#5eff00ff' :   // Merah
+      tingkat === 'Tidak Sesuai' ? '#ff0000ff' :   // Oranye
+      '#0b20e2ff',                           // Default
+    weight: 1,
+    opacity: 1,
+    color: 'white',
+    fillOpacity: 0.7
+  };
+}
+
+//BANJIR
+layers.banjir = window.json_KERENTANANBANJIR_10
+  ? L.geoJSON(json_KERENTANANBANJIR_10, {
+      style: styleBanjir
+    })
+  : null;
+
+  function styleBanjir(feature) {
+  const tingkat = feature.properties.Kelas_KB;
+
+  return {
+    fillColor:
+      tingkat === 'Tinggi' ? '#ff0000ff' :   // Merah
+      tingkat === 'Sedang' ? '#ffee00ff' :   // Oranye
+      tingkat === 'Rendah' ? '#2e7d32' :   // Hijau
+      '#2e7d32',                           // Default
+    weight: 1,
+    opacity: 1,
+    color: 'white',
+    fillOpacity: 0.7
+  };
+}
+
+// Drainase
+layers.drainase_baik = (window.json_Drainase_baik_5) ? L.geoJSON(json_Drainase_baik_5, { style: { color: "blue", weight: 4 } }) : L.layerGroup();
+layers.drainase_buruk = (window.json_Drainase_buruk_6) ? L.geoJSON(json_Drainase_buruk_6, { style: { color: "black", weight: 4, dashArray: "5,5" } }) : L.layerGroup();
+
+// UMKM Satuan
+layers.umkm_jasa = (window.json_UMKMJASA_3) ? L.geoJSON(json_UMKMJASA_3, { pointToLayer: (f, latlng) => L.circleMarker(latlng, { radius: 6, fillColor: "#e0752f", color: "#fff", weight: 1, fillOpacity: 0.9 }) }) : L.layerGroup();
+layers.umkm_kelontong = (window.json_UMKMKLONTONG_2) ? L.geoJSON(json_UMKMKLONTONG_2, { pointToLayer: (f, latlng) => L.circleMarker(latlng, { radius: 6, fillColor: "#a5a5a5", color: "#fff", weight: 1, fillOpacity: 0.9 }) }) : L.layerGroup();
+layers.umkm_kuliner = (window.json_UMKMMAKANANMINUMAN_4) ? L.geoJSON(json_UMKMMAKANANMINUMAN_4, { pointToLayer: (f, latlng) => L.circleMarker(latlng, { radius: 6, fillColor: "#2f67b1", color: "#fff", weight: 1, fillOpacity: 0.9 }) }) : L.layerGroup();
+layers.umkm_material = (window.json_UMKMMATERIAL_1) ? L.geoJSON(json_UMKMMATERIAL_1, { pointToLayer: (f, latlng) => L.circleMarker(latlng, { radius: 6, fillColor: "#fcc100", color: "#fff", weight: 1, fillOpacity: 0.9 }) }) : L.layerGroup();
+
+// --- 4. FUNGSI NAVIGASI & TOGGLE ---
+
+function toggleLayer(type) {
+    if (layers[type]) {
+        if (map.hasLayer(layers[type])) {
+            map.removeLayer(layers[type]);
+        } else {
+            layers[type].addTo(map);
+        }
+    }
+}
+
+function toggleGroup(type) {
+    let group = (type === 'umkm_all') 
+        ? ['umkm_jasa', 'umkm_kelontong', 'umkm_kuliner', 'umkm_material'] 
+        : ['drainase_baik', 'drainase_buruk'];
+
+    group.forEach(name => toggleLayer(name));
+}
+
+function showSection(id) {
+    document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if (id === 'map') setTimeout(() => map.invalidateSize(), 300);
+}
+
+function toggleLayerMenu() {
+    const menu = document.getElementById('layerMenu');
+    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+}
+
+function goToMapAndFocus(type) {
+    showSection('map');
+    // Jika tipe adalah grup, nyalakan grupnya
+    if (type === 'umkm') toggleGroup('umkm_all');
+    else if (type === 'drainase') toggleGroup('drainase_all');
+    else toggleLayer(type);
+    
+    // Auto zoom ke layer
+    if (layers[type] && layers[type].getBounds) {
+        setTimeout(() => map.fitBounds(layers[type].getBounds()), 500);
+    }
+}
+L.geoJSON(json_DBD_1).addTo(map);
+map.fitBounds(L.geoJSON(json_DBD_1).getBounds());
+</script>
+
+</body>
+</html>
